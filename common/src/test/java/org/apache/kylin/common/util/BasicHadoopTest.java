@@ -21,12 +21,17 @@ package org.apache.kylin.common.util;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.kylin.common.KylinConfig;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.kylin.common.persistence.HBaseConnection;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -57,7 +62,10 @@ public class BasicHadoopTest {
         tableDesc.addFamily(cf);
 
         Configuration conf = HBaseConfiguration.create();
-        HBaseAdmin admin = new HBaseAdmin(conf);
+        //TODO: to check
+	String hbaseZookeeperQuorum = conf.get(HConstants.ZOOKEEPER_QUORUM).startsWith("hbase") ? conf.get(HConstants.ZOOKEEPER_QUORUM) : KylinConfig.getInstanceFromEnv().getStorageUrl();
+        Connection connection = HBaseConnection.get(hbaseZookeeperQuorum);
+        Admin admin = connection.getAdmin();
         admin.createTable(tableDesc);
         admin.close();
     }
@@ -65,7 +73,10 @@ public class BasicHadoopTest {
     @Test
     public void testRetriveHtableHost() throws IOException {
         Configuration conf = HBaseConfiguration.create();
-        HBaseAdmin hbaseAdmin = new HBaseAdmin(conf);
+        //TODO: to check
+        String hbaseZookeeperQuorum = conf.get(HConstants.ZOOKEEPER_QUORUM).startsWith("hbase") ? conf.get(HConstants.ZOOKEEPER_QUORUM) : KylinConfig.getInstanceFromEnv().getStorageUrl();
+        Connection connection = HBaseConnection.get(hbaseZookeeperQuorum);
+        Admin hbaseAdmin = connection.getAdmin();
         HTableDescriptor[] tableDescriptors = hbaseAdmin.listTables();
         for (HTableDescriptor table : tableDescriptors) {
             String value = table.getValue("KYLIN_HOST");

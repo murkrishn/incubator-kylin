@@ -25,10 +25,14 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.kylin.common.KylinConfig;
+import org.apache.kylin.common.persistence.HBaseConnection;
 import org.apache.kylin.job.hadoop.AbstractHadoopJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +76,10 @@ public class HtableAlterMetadataCLI extends AbstractHadoopJob {
 
     private void alter() throws IOException {
         Configuration conf = HBaseConfiguration.create();
-        HBaseAdmin hbaseAdmin = new HBaseAdmin(conf);
+        //TODO: to check
+        String hbaseZookeeperQuorum = conf.get(HConstants.ZOOKEEPER_QUORUM).startsWith("hbase") ? conf.get(HConstants.ZOOKEEPER_QUORUM) : KylinConfig.getInstanceFromEnv().getStorageUrl();
+	Connection connection = HBaseConnection.get(hbaseZookeeperQuorum);
+        Admin hbaseAdmin = connection.getAdmin();
         HTableDescriptor table = hbaseAdmin.getTableDescriptor(TableName.valueOf(tableName));
 
         hbaseAdmin.disableTable(table.getTableName());

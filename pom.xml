@@ -49,7 +49,7 @@
         <yarn.version>2.7.0</yarn.version>
         <zookeeper.version>3.4.6</zookeeper.version>
         <hive.version>1.1.0</hive.version>
-        <hive-hcatalog.version>1.1.0</hive-hcatalog.version>
+        <hive-hcatalog.version>1.2.1</hive-hcatalog.version>
         <hbase-hadoop2.version>1.1.0</hbase-hadoop2.version>
         <curator.version>2.7.1</curator.version>
 
